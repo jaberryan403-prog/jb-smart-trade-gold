@@ -1,0 +1,501 @@
+ممتاز، وبناءً على النقاش الذي كتبته، أفضل تحويله إلى نظام تحليلي عملي للذهب (XAUUSD) بدل كلام نظري.
+
+الإطار التحليلي المقترح للذهب (Indicators Matrix)
+اعتمد هذه المؤشرات كطبقات قرار، وليس كإشارات منفصلة:
+
+HTF Bias (4H/1H)
+تحديد الاتجاه من خلال BOS/CHoCH + آخر قمة/قاع خارجي (Draw on Liquidity).
+
+Liquidity Map
+تحديد:
+
+Equal Highs / Equal Lows
+Asian Range High/Low
+Session High/Low (London/NY)
+Swing liquidity (قمم/قيعان واضحة)
+PD Array Location
+هل السعر في Discount للشراء أو Premium للبيع ضمن نطاق مرجعي واضح (آخر swing أو dealing range).
+
+FVG Validity
+فجوة سعرية 3 شمعات مع شروط صلاحية:
+
+وجود اندفاع حقيقي قبلها/بعدها
+عدم امتلائها بالكامل قبل التفعيل
+توافقها مع اتجاه HTF
+Order Block / Mitigation / Breaker
+آخر شمعة معاكسة قبل كسر هيكل معتبر + اختبار نظيف.
+
+Session & Time Filter
+التداول فقط داخل نوافذ تنفيذ:
+
+London Killzone
+NY AM Killzone
+وتجنّب الأوقات الميتة/قبل الأخبار مباشرة.
+Risk/Event Filter
+فلتر أخبار عالي التأثير (USD) + حد أقصى للسبريد والانزلاق.
+
+نموذج تقييم رقمي (Scoring) قبل أي دخول
+اعطِ كل عامل وزن، ثم قيّم الصفقة من 100:
+
+HTF Bias + Structure: 30
+Liquidity Alignment: 20
+PD Location: 15
+FVG/OB Quality: 20
+Session Timing: 10
+News/Volatility Safety: 5
+قاعدة تنفيذ:
+
+أقل من 70: لا دخول
+70–79: دخول مخفف
+80+: دخول قياسي
+90+: A+ setup
+مخرجات مطلوبة من التحليل (للاستخدام مع AI)
+قبل طلب سيناريو دخول، جهّز هذه البيانات في شكل ثابت:
+
+symbol: XAUUSD
+current_price
+HTF_structure: bullish/bearish/neutral
+last_BOS, last_CHoCH
+external_liquidity_target: buyside/sellside
+nearest_liquidity_zones: قائمة مستويات
+pd_state: premium/discount/equilibrium
+active_FVGs: مع الحالة (valid/invalid, touched/untouched)
+OB_levels: nearest bullish/bearish OB
+session: Asia/London/NY
+within_killzone: true/false
+high_impact_news_next_60m: true/false
+ATR أو حالة التذبذب
+spread_state: normal/high
+برومبت جاهز لنموذج الذكاء الاصطناعي (Entry Scenario Prompt)
+انسخ هذا كما هو ومرر له بياناتك:
+
+أنت محلل تداول مؤسسي وفق منهج ICT/SMC. مهمتك: تقييم فرصة دخول على الذهب XAUUSD بناءً على البيانات التالية فقط، بدون اختراع بيانات.
+[DATA]
+symbol: {{symbol}}
+current_price: {{current_price}}
+htf_structure: {{htf_structure}}
+last_BOS: {{last_BOS}}
+last_CHoCH: {{last_CHoCH}}
+external_liquidity_target: {{external_liquidity_target}}
+nearest_liquidity_zones: {{nearest_liquidity_zones}}
+pd_state: {{pd_state}}
+active_FVGs: {{active_FVGs}}
+ob_levels: {{ob_levels}}
+session: {{session}}
+within_killzone: {{within_killzone}}
+high_impact_news_next_60m: {{high_impact_news_next_60m}}
+atr_state: {{atr_state}}
+spread_state: {{spread_state}}
+[INSTRUCTIONS]
+1) حدّد التحيز: Buy / Sell / No Trade مع سبب مختصر.
+2) قيّم الصفقة بنظام نقاط من 100 وفق الأوزان:
+   - HTF structure=30
+   - Liquidity alignment=20
+   - PD location=15
+   - FVG/OB quality=20
+   - Session timing=10
+   - News/volatility safety=5
+3) إن كانت النتيجة <70: ارفض الدخول واذكر ما الذي ينقص.
+4) إن كانت >=70: أعطني سيناريو تنفيذ كامل:
+   - Entry type (limit/confirmation)
+   - Entry zone
+   - Stop loss (منطقي خلف السيولة/الهيكل)
+   - TP1 / TP2 / TP3
+   - R:R المتوقع
+   - شرط الإلغاء (Invalidation)
+5) أعطني بديلين:
+   - السيناريو الأساسي
+   - السيناريو المعاكس إذا فشل الأساسي
+6) لا تعطِ توصية نهائية مطلقة؛ قدّمها كخطة احتمالية مشروطة.
+7) أخرج النتيجة بهذا الشكل:
+   - Bias
+   - Score/100
+   - Trade Plan
+   - Invalidation
+   - Alternate Scenario
+   - Execution Checklist (5 نقاط)
+أفضل قرار عملي الآن (مقترح مباشر)
+منهج العمل: Playbook موحّد (أفضل من حلقة-حلقة).
+أول PoC: Carmine FVG + HTF Structure + Killzone (ثلاثي قوي وقابل للبرمجة).
+السوق المستهدف: XAUUSD ممتاز كبداية لأنه سيولة عالية ورد فعل واضح على الجلسات والأخبار.
+إذا أردت، الخطوة التالية أبني لك فورًا نسخة v1 من Playbook الذهب بصيغة قواعد If/Then جاهزة للتحويل إلى مؤشر أو بوت.
+
+
+
+اح:
+
+1) هل تحتاج تشرح كل حلقة؟
+لا، لا نحتاج شرح كامل لكل حلقة.
+نحتاج فقط استخراج منظم من كل حلقة (قالب ثابت) حتى نربط الأفكار بدون تشويش.
+استخدم هذا القالب لكل حلقة:
+
+تعريف واضح للمفهوم (مثل FVG/CHoCH/OB)
+شروط التفعيل (Setup Conditions)
+شروط الإلغاء (Invalidation)
+وقت التنفيذ (Session/Killzone)
+قواعد الدخول/SL/TP
+1-2 مثال حقيقي
+ما هو الجزء “الذوقي” غير القابل للبرمجة
+بهذه الطريقة نأخذ “الصلب” فقط ونترك التفاصيل الشخصية.
+
+2) بوت أم مؤشرات + نموذج AI؟
+البداية الأفضل الآن: مؤشرات + محرك قرار AI
+ليس بوت تنفيذ مباشر في البداية.
+السبب:
+
+البوت الكامل مبكرًا = أخطاء تنفيذ + صعوبة تصحيح.
+المؤشرات تعطيك بيانات نظيفة، والـAI يبني سيناريو، وأنت تتحكم بالتنفيذ.
+بعد 4-8 أسابيع نتائج جيدة، نحول جزءًا منه إلى شبه آلي ثم آلي.
+الخطة الذكية:
+
+نبني 3-5 مؤشرات أساسية (Structure, Liquidity, FVG, Session, PD).
+نخرجها بصيغة JSON كل شمعة/كل تحديث.
+ندمجها مع بيانات السوق (السعر، ATR، سبريد، أخبار).
+نرسلها للـAI مع برومبت موحّد لإخراج سيناريو دخول مشروط.
+نراجع الأداء، ثم نقرر الانتقال للبوت.
+3) هل الفكرة صحيحة: “بيانات مؤشرات + بيانات سوق + برومبت خاص”؟
+نعم، وهذه أفضل هندسة حالياً.
+هذا بالضبط ما يجعل القرار أكثر اتساقًا ويقلل العشوائية.
+4) cTrader أم MetaTrader؟
+إذا هدفك السرعة في التطوير + مرونة الربط مع AI:
+
+cTrader غالبًا أسهل وأنظف برمجيًا (C# وبيئة حديثة).
+إذا هدفك الانتشار + كثرة الأدوات/المجتمع + وسطاء أكثر:
+
+MetaTrader (خصوصًا MT5) أقوى من ناحية الانتشار والموارد.
+توصيتي لك (عملية):
+إن كنت تبدأ من الصفر وتريد مشروع نظيف: cTrader.
+إن كان وسيطك الأساسي قوي على MT5 أو تريد تشغيل واسع لاحقًا: MT5.
+للأفضلية الواقعية في النجاح:
+النجاح لن يأتي من المنصة، بل من جودة الـPlaybook والانضباط في الفلاتر.
+5) ما الذي يرفع الاحتمالية فعلاً؟
+إطار قرار ثابت (Scoring) بدل قرارات مزاجية.
+فلتر جلسات + فلتر أخبار إجباري.
+لا دخول خارج Killzones.
+لا دخول بدون توافق HTF + Liquidity + PD + Trigger.
+تتبع إحصائي أسبوعي وإزالة الشروط الضعيفة.
+إذا موافق، الخطوة التالية مباشرة:
+
+أرسل لي ملخص أول حلقة بالقالب أعلاه،
+وأنا أحولها لك إلى:
+قواعد مؤشر دقيقة،
+JSON schema موحد للبيانات،
+برومبت نهائي مخصص للذهب XAUUSD.
+طلبت:
+
+اعتماد مصدر الشرح الأساسي من ملفاتك (وليس فقط الحلقات).
+البدء بـ مؤشرات + نموذج AI (بدل بوت تنفيذ مباشر في البداية).
+اعتماد منصة cTrader.
+إنشاء مجلد المشروع باسم JB SMART TRADE على سطح المكتب، وتم نقل بيئة العمل إليه ليكون هو جذر المشروع الحالي.
+النقطة الوحيدة المتبقية الآن:
+
+ملفات docx الثلاثة لا يمكن قراءتها مباشرة عبر أدوات التحليل الحالية بصيغتها الثنائية.
+أرسلها بصيغة PDF أو TXT/Markdown (أو انسخ النص هنا)، وسأحوّلها فورًا إلى:
+Playbook موحد،
+مواصفات المؤشرات (قابلة للتنفيذ على cTrader)،
+مخطط بيانات JSON قياسي،
+Prompt نهائي مخصص لـ XAUUSD.
+إذا أردت، أبدأ مباشرة بعد استلام المحتوى بتحضير الإصدار v1 من هيكل المشروع داخل JB SMART TRADE (مجلدات: indicators / data-schema / prompts / playbook).
+
+
+تم المتابعة ✅ وأنجزت الجزء التالي بالكامل:
+
+أضفت JB_POIEngine في:
+
+src/JBSmartTrade/Indicators/JB_POIEngine.algo.cs
+يدعم:
+FVG (صاعد/هابط) مع فلتر displacement
+Order Block (نسخة ميكانيكية أولية)
+Mitigation depth
+Breaker flags
+poi_quality_score
+تصدير JSONL في jb_poi_engine.jsonl
+ثم أضفت JB_SessionRiskFilter في:
+
+src/JBSmartTrade/Indicators/JB_SessionRiskFilter.algo.cs
+يدعم:
+تحديد الجلسة/الـKillzone
+تصنيف السبريد (normal/elevated/high)
+تصنيف التذبذب (ATR state)
+tradable flag
+تصدير JSONL في jb_session_risk_filter.jsonl
+وتم تحديث:
+
+src/JBSmartTrade/README.md
+ملاحظة تقنية مهمة:
+
+تحويل التوقيت لـ NY داخل JB_SessionRiskFilter حاليًا تقريبي (UTC-4) لضمان عمله بسرعة.
+بعد ما تثبّت المؤشرات ونختبرها، سأعدلها لنسخة DST-aware أدق لو رغبت.
+الخطوة التالية مباشرة (الآن):
+
+تنفيذ JB_SetupScorer ليجمع نتائج:
+Structure + Liquidity + PD + POI + Session/Risk
+ويخرج score/100 + decision class
+ثم نعمل snapshot merger مطابق لـ market-ai-schema-v1.json.
+إذا موافق أكمل فورًا على هذا الجزء.
+
+
+ممتاز، الأخطاء واضحة جدًا وسببها توافق بيئة cTrader: سأعدّل JB_LiquidityMapper ليكون Self-contained بدون اعتماد على JBSmartTrade.Common، وأستبدل Bars.Bid/Ask بـ Bars.ClosePrices حتى يشتغل مباشرة عندك.
+
+ممتاز، تم إصلاح أخطاء JB_LiquidityMapper التي أرسلتها ✅
+
+التعديلات التي عملتها على JB_LiquidityMapper.algo.cs:
+
+حذفت الاعتماد على:
+using JBSmartTrade.Common;
+حوّلت المؤشر ليكون Self-contained بإضافة دوال داخلية:
+AppendJsonLine(...)
+BuildDefaultExportPath()
+استبدلت:
+Bars.Bid.Close[...] و Bars.Ask.Close[...]
+بـ Bars.ClosePrices[...] لأن Bars في cTrader لا يحتوي Bid/Ask بهذه الطريقة.
+أزلت كل مراجع FeatureExporter الخارجية.
+لماذا ظهرت الأخطاء أصلاً؟
+cTrader يبني كل مؤشر داخل مجلد/مشروع منفصل غالبًا، لذلك الملفات المشتركة مثل FeatureExporter.cs لا تُرى تلقائيًا.
+بعض خصائص API تختلف (Bars.ClosePrices هو المتوافق هنا).
+إذا تريد، الخطوة التالية أفضل الآن:
+
+أطبق نفس أسلوب الإصلاح على باقي المؤشرات (Structure, PDMatrix, POI, SessionRisk) قبل ما تظهر نفس الأخطاء عندك.
+أرسل اسم المؤشر التالي أو قل لي "اصلحهم كلهم" وأنا أنهيها دفعة واحدة.
+
+ممتاز جدًا، الآن دخلنا مرحلة التشغيل الفعلي.
+
+التوزيع الصحيح على الفريمات (XAUUSD)
+H4
+
+JB_StructureEngine
+JB_PDMatrix
+الهدف: الانحياز العام + مكان السعر (Premium/Discount)
+H1
+
+JB_StructureEngine
+JB_LiquidityMapper
+JB_PDMatrix
+الهدف: اتجاه عملي + أهداف السيولة القريبة
+M15
+
+JB_POIEngine
+JB_SessionRiskFilter
+(اختياري: JB_LiquidityMapper)
+الهدف: التفعيل والتنفيذ داخل الجلسة
+M5 (اختياري للتنقيح فقط)
+
+JB_POIEngine
+الهدف: تحسين نقطة الدخول بعد تأكيد M15
+ترتيب القراءة قبل أي دخول
+ابدأ بـ H4:
+
+خذ htf_bias من JB_StructureEngine
+خذ zone من JB_PDMatrix
+ثم H1:
+
+تأكد أن الهيكل لا يعاكس H4
+حدد external_target من JB_LiquidityMapper
+ثم M15:
+
+راقب FVG/OB/breaker من JB_POIEngine
+تأكد within_killzone=true و tradable=true من JB_SessionRiskFilter
+قاعدة تنفيذ:
+لا دخول إذا H4/H1 غير متوافقين، حتى لو M15 أعطى إشارة.
+
+من أين تقرأ البيانات (المخرجات)
+ستجدها في:
+
+C:\Users\Besho\Documents\JB SMART TRADE\exports\YYYY-MM-DD\
+الملفات:
+
+jb_structure_engine.jsonl
+jb_liquidity_mapper.jsonl
+jb_pd_matrix.jsonl
+jb_poi_engine.jsonl
+jb_session_risk_filter.jsonl
+كل سطر = snapshot لشمعة مغلقة.
+
+إعدادات تشغيل مبدئية (موصى بها)
+StructureEngine
+
+External Swing Strength = 5 على H4/H1
+Close Break Only = true
+LiquidityMapper
+
+Swing Strength = 3
+Equal Tolerance = 20-40 pips (ابدأ بـ 30)
+PDMatrix
+
+Swing Strength = 5
+OTE 0.62 - 0.79 (افتراضي جيد)
+POIEngine
+
+Min FVG Size = 15-30 pips (ابدأ 20)
+Min Displacement ATR = 1.2
+SessionRiskFilter
+
+London KZ: 2 -> 5 NY
+NY AM KZ: 7 -> 10 NY
+الخطوة التالية الأنسب الآن:
+
+أبدأ لك مباشرة JB_SetupScorer ليقرأ هذه المخرجات ويعطيك Score/100 + Trade/No Trade تلقائيًا.
+
+
+متاز، بما أنك ركّبتها على نفس الفريمات المقترحة، فأنت غالبًا مضبوط بنسبة كبيرة.
+
+هل الإعدادات مضبوطة تلقائيًا؟
+نعم مبدئيًا إذا تركت القيم الافتراضية التي بنيناها.
+
+لكن يلزم تحقق سريع قبل الاعتماد:
+
+Export JSON = true في كل مؤشر
+
+Export Path (optional):
+
+إما فارغ (المسار الافتراضي)
+أو نفس المسار المخصص في كل المؤشرات
+على M15 تأكد JB_SessionRiskFilter يظهر Tradable Flag ويتغير داخل/خارج الكيل زون
+
+على H4/H1 تأكد خطوط Protected High/Low و Equilibrium تظهر وتتحرك مع الشارت
+
+الخطوة التالية الآن (المهم)
+الآن نبدأ اختبار تدفق البيانات قبل أي AI:
+
+انتظر إغلاق 3-5 شمعات على كل فريم
+افتح مجلد الإخراج:
+C:\Users\Besho\Documents\JB SMART TRADE\exports\YYYY-MM-DD\
+تأكد الملفات الخمسة موجودة وتتحدث (يزيد عدد الأسطر)
+تحقق أن كل سطر JSON صالح (بدون رموز غريبة)
+إذا هذا نجح، ننتقل فورًا للمرحلة التي بعدها:
+
+المرحلة القادمة مباشرة
+بناء JB_SetupScorer ليجمع:
+Structure + Liquidity + PD + POI + Session/Risk
+ويخرج:
+score/100
+decision (NoTrade / Reduced / Normal / A+)
+هذه أهم خطوة الآن لأنها ستنقلنا من “قراءة مؤشرات” إلى “قرار موحّد قابل للإرسال للـAI”.
+
+إذا موافق، أبدأ فورًا بكتابة JB_SetupScorer كالمؤشرات السابقة (جاهز للتركيب في cTrader).
+
+
+ممتاز جدًا، هذا الخطأ تم تحديد سببه بدقة وتم إصلاحه ✅
+
+السبب:
+
+بعض القيم في بداية تشغيل المؤشر تكون NaN أو Infinity (خصوصًا أقرب سيولة قبل توفر سوينغات كافية).
+JsonSerializer كان ينهار عند محاولة كتابة هذه القيم.
+ما الذي أصلحته الآن:
+
+في JB_LiquidityMapper:
+منعت تصدير القيم غير الصالحة لأقرب سيولة:
+nearest_buyside / nearest_sellside أصبحت تُصدّر كمصفوفة فارغة إذا لا توجد قيمة صالحة.
+فلترة equal_highs/equal_lows لتتضمن فقط القيم الـ finite.
+في جميع المؤشرات (Structure, PDMatrix, POI, SessionRisk, Liquidity) :
+جعلت serializer يتعامل بأمان مع القيم الخاصة بدل الكراش:
+JsonNumberHandling.AllowNamedFloatingPointLiterals
+المطلوب منك الآن
+أعد Build/Compile للمؤشرات المحدثة.
+احذف المؤشر JB_LiquidityMapper من الشارت ثم أضفه مرة ثانية (لضمان تحميل النسخة الجديدة).
+راقب الـ Log لمدة دقيقة.
+المفترض:
+
+لا مزيد من Crashed in Calculate
+يبدأ التصدير في ملف:
+jb_liquidity_mapper.jsonl
+إذا ظهر أي خطأ جديد، أرسله كما هو (اسم المؤشر + أول سطرين من الـstack/error)، وسأعطيك patch مباشر فورًا.
+
+
+ممتاز جدًا — راجعت الملفات الخمسة، والنتيجة:
+
+الحالة العامة
+التصدير يعمل بنجاح في كل الملفات.
+لا يوجد انهيار JSON الآن.
+البيانات تتحدث بانتظام حسب إغلاق الشموع.
+ملاحظات مهمة من الفحص
+jb_liquidity_mapper.jsonl
+
+يعمل، لكن ظهر تضخم واضح في equal_highs (تكرار نفس المستوى عشرات المرات عند آخر سطر).
+هذا ليس خطأ قاتل، لكنه يسبب ضوضاء في التقييم.
+jb_pd_matrix.jsonl
+
+جيد جدًا، range/equilibrium/zone/ote_zone واضحة.
+يوجد مزيج فريمات (Hour4 ثم Hour) داخل نفس الملف، وهذا طبيعي لأن نفس المؤشر شغال على أكثر من شارت.
+jb_poi_engine.jsonl
+
+يعمل، والقيم منطقية.
+poi_quality_score يبدو ثابتًا لفترات طويلة نسبيًا (35 أو 60)، وهذا متوقع حاليًا بسبب منطق مبسط للـPOI.
+jb_session_risk_filter.jsonl
+
+ممتاز، within_killzone وtradable يتغيران بشكل صحيح حسب الوقت.
+ملاحظة: بعد نهاية NY AM يتحول tradable=false كما هو متوقع.
+jb_structure_engine.jsonl
+
+يعمل، ويعطي bias/levels بشكل سليم.
+أيضًا يوجد أكثر من timeframe بنفس الملف (طبيعي).
+الخطوة التالية (الآن)
+المرحلة الجاهزة فعليًا:
+نبني JB_SetupScorer + Snapshot Merger ليقرأ آخر قيمة من كل ملف لكل فريم مستهدف ويعطي:
+
+score/100
+decision_class (NoTrade / Reduced / Normal / A+)
+final snapshot مطابق market-ai-schema-v1.json
+ملف موحد مثل: jb_market_snapshot.jsonl
+تحسين صغير قبل السكورر (اختياري لكن أنصح به)
+في LiquidityMapper:
+
+إزالة التكرارات من equal_highs/equal_lows (Distinct مع تقريب سعري) + حد أقصى (مثلاً 10 مستويات).
+هذا سيحسن جودة الـscore ويقلل التضخيم.
+إذا موافق، أبدأ فورًا بتنفيذ:
+
+Patch تنظيف equal_highs/lows
+بناء JB_SetupScorer
+بناء Snapshot Merger النهائي.
+
+
+ممتاز، تم التنفيذ كما اتفقنا ✅
+
+ما تم إنجازه الآن
+حسّنت JB_LiquidityMapper لحل مشكلة تضخّم equal_highs/lows:
+
+إزالة التكرار بمقارنة ضمن tolerance
+إضافة حد أقصى قابل للإعداد:
+Max Equal Levels (افتراضي 10)
+أنشأت أداة دمج + تقييم نهائي:
+
+tools/merge_and_score.py
+هذه الأداة تقرأ آخر القيم من ملفات:
+
+jb_structure_engine.jsonl
+jb_liquidity_mapper.jsonl
+jb_pd_matrix.jsonl
+jb_poi_engine.jsonl
+jb_session_risk_filter.jsonl
+وتنتج snapshot موحّد مع:
+
+scoring.total
+تفصيل الأوزان الستة
+decision (NoTrade / Reduced / Normal / A+)
+كيف تستخدمها الآن (عندك محليًا)
+شغّل:
+
+python "C:\Users\Besho\Desktop\JB SMART TRADE\tools\merge_and_score.py"
+أو:
+
+py -3 "C:\Users\Besho\Desktop\JB SMART TRADE\tools\merge_and_score.py"
+ثم تحقق من الملف الناتج (اليوم الحالي):
+
+C:\Users\Besho\Documents\JB SMART TRADE\exports\2026-04-17\jb_market_snapshot.jsonl
+كل تشغيل يضيف سطر جديد (snapshot جديد).
+
+الخطوة التالية مباشرة
+أرسل لي آخر سطر من jb_market_snapshot.jsonl
+وسأعطيك فورًا:
+تفسير الـscore الحالي،
+هل القرار منطقي أم يحتاج ضبط أوزان،
+تحسينات دقيقة على المعلمات (خصوصًا POI + Liquidity) لرفع جودة الإشارة
+
+
+PS C:\Users\Besho\Desktop\JB SMART TRADE> python "C:\Users\Besho\Desktop\JB SMART TRADE\tools\merge_and_score.py"
+C:\Users\Besho\Desktop\JB SMART TRADE\tools\merge_and_score.py:122: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  today = datetime.utcnow().strftime("%Y-%m-%d")
+C:\Users\Besho\Desktop\JB SMART TRADE\tools\merge_and_score.py:176: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  "timestamp_utc": datetime.utcnow().isoformat() + "Z",
+Snapshot written: C:\Users\Besho\Documents\JB SMART TRADE\exports\2026-04-17\jb_market_snapshot.jsonl
+Score: 72/100 | Decision: Reduced

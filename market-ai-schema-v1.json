@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "JB Smart Trade Market Snapshot v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "timestamp_utc",
+    "symbol",
+    "timeframe",
+    "price",
+    "structure",
+    "liquidity",
+    "pd_matrix",
+    "poi",
+    "session",
+    "risk_filters",
+    "scoring"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "timestamp_utc": { "type": "string" },
+    "symbol": { "type": "string", "const": "XAUUSD" },
+    "timeframe": { "type": "string" },
+    "price": {
+      "type": "object",
+      "required": ["bid", "ask", "mid"],
+      "properties": {
+        "bid": { "type": "number" },
+        "ask": { "type": "number" },
+        "mid": { "type": "number" }
+      }
+    },
+    "structure": {
+      "type": "object",
+      "required": ["htf_bias", "last_bos", "last_choch", "protected_high", "protected_low"],
+      "properties": {
+        "htf_bias": { "type": "string", "enum": ["bullish", "bearish", "neutral"] },
+        "last_bos": { "type": "string" },
+        "last_choch": { "type": "string" },
+        "protected_high": { "type": "number" },
+        "protected_low": { "type": "number" }
+      }
+    },
+    "liquidity": {
+      "type": "object",
+      "required": ["external_target", "nearest_buyside", "nearest_sellside", "sweep_state"],
+      "properties": {
+        "external_target": { "type": "string", "enum": ["buyside", "sellside", "none"] },
+        "nearest_buyside": { "type": "array", "items": { "type": "number" } },
+        "nearest_sellside": { "type": "array", "items": { "type": "number" } },
+        "sweep_state": { "type": "string", "enum": ["swept", "not_swept", "unknown"] }
+      }
+    },
+    "pd_matrix": {
+      "type": "object",
+      "required": ["range_high", "range_low", "equilibrium", "zone"],
+      "properties": {
+        "range_high": { "type": "number" },
+        "range_low": { "type": "number" },
+        "equilibrium": { "type": "number" },
+        "zone": { "type": "string", "enum": ["premium", "discount", "equilibrium"] },
+        "ote_zone": {
+          "type": "object",
+          "properties": {
+            "low": { "type": "number" },
+            "high": { "type": "number" },
+            "is_inside": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "poi": {
+      "type": "object",
+      "required": ["active_fvg", "active_ob", "breaker", "mitigation", "poi_quality_score"],
+      "properties": {
+        "active_fvg": { "type": "array", "items": { "type": "object" } },
+        "active_ob": { "type": "array", "items": { "type": "object" } },
+        "breaker": { "type": "array", "items": { "type": "object" } },
+        "mitigation": { "type": "array", "items": { "type": "object" } },
+        "poi_quality_score": { "type": "number", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "session": {
+      "type": "object",
+      "required": ["name", "within_killzone"],
+      "properties": {
+        "name": { "type": "string", "enum": ["asia", "london", "new_york", "other"] },
+        "within_killzone": { "type": "boolean" }
+      }
+    },
+    "risk_filters": {
+      "type": "object",
+      "required": ["high_impact_news_60m", "spread_state", "atr_state", "min_rr_ok"],
+      "properties": {
+        "high_impact_news_60m": { "type": "boolean" },
+        "spread_state": { "type": "string", "enum": ["normal", "elevated", "high"] },
+        "atr_state": { "type": "string", "enum": ["low", "normal", "high"] },
+        "min_rr_ok": { "type": "boolean" }
+      }
+    },
+    "scoring": {
+      "type": "object",
+      "required": [
+        "total",
+        "structure_30",
+        "liquidity_20",
+        "pd_15",
+        "poi_20",
+        "session_10",
+        "risk_5"
+      ],
+      "properties": {
+        "total": { "type": "number", "minimum": 0, "maximum": 100 },
+        "structure_30": { "type": "number" },
+        "liquidity_20": { "type": "number" },
+        "pd_15": { "type": "number" },
+        "poi_20": { "type": "number" },
+        "session_10": { "type": "number" },
+        "risk_5": { "type": "number" }
+      }
+    }
+  }
+}
